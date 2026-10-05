@@ -1,0 +1,21 @@
+{
+ "_doc": "Images removed from the grouped dataset (scripts/curate_dataset.py). Each rule names images, file-name prefixes or a group, with the reason. Added 2026-10-04 after a teammate's review, verified by rendering every affected image.",
+ "exclude": [
+  {
+   "prefixes": ["pl_"],
+   "reason": "pl_* web-scraped images (54): publisher/stock watermarks (Elsevier, alamy, Getty/Science Photo Library, Imaging Study), teaching slides with the answer burned in ('Cholelithiasis', 'Stone', 'GALLBLADDER'), a patient name/ID overlay, hospital screens; some are not gallstones (liver/IVC figure, CBD stone). Text shortcut, PHI and copyright risk."
+  },
+  {
+   "prefixes": ["pseudo_c29__28_"],
+   "reason": "Full-frame box (area 0.961) on liver parenchyma, no gallbladder in view: bad annotation."
+  },
+  {
+   "prefixes": ["pseudo_c26__57_"],
+   "reason": "Full-frame box (area 0.988) on a heterogeneous mass, not a stone: bad annotation."
+  },
+  {
+   "group": "a6",
+   "reason": "Test video a6 boxes the whole stone-filled gallbladder (median box 7.3% of the frame, ~26x the dataset median) instead of individual stones: different labelling convention. Held out until relabelled per stone."
+  }
+ ]
+}

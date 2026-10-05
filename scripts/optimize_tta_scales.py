@@ -7,7 +7,7 @@ import cv2
 from pathlib import Path
 from tqdm import tqdm
 from src.models.ensemble import GallstoneEnsemble
-from src.evaluation.map_calculator import calculate_map
+from src.evaluation.coco_map import coco_map50
 
 def load_validation_data(data_dir="data/processed"):
     """Load validation images and labels"""
@@ -130,7 +130,7 @@ def evaluate_scales(ensemble, val_images, val_labels, scales, conf_threshold=0.2
 
     # Calculate mAP
     try:
-        current_map = calculate_map(all_predictions, all_targets, iou_threshold=0.5)
+        current_map = coco_map50(all_predictions, all_targets)
         return current_map
     except Exception as e:
         print(f"Error calculating mAP: {e}")

@@ -1,9 +1,13 @@
 """
-Simple mAP calculator for optimization scripts
+Per-image mean F1 at a fixed IoU. NOT mean Average Precision.
+
+Historically exported as `calculate_map`, which made F1 look like mAP in every
+report (see docs/LEAKAGE_AUDIT.md). Use `src.evaluation.coco_map` for mAP.
 """
+import warnings
 import numpy as np
 
-def calculate_map(predictions, targets, iou_threshold=0.5):
+def mean_image_f1(predictions, targets, iou_threshold=0.5):
     """
     Calculate mean Average Precision at given IoU threshold
 
@@ -146,3 +150,9 @@ def compute_iou(box1, box2):
         return 0.0
 
     return intersection / union
+
+def calculate_map(predictions, targets, iou_threshold=0.5):
+    """Deprecated misnomer: returns mean per-image F1, not mAP."""
+    warnings.warn("calculate_map returns mean per-image F1, not mAP; use "
+                  "src.evaluation.coco_map.coco_map50 or mean_image_f1", DeprecationWarning, stacklevel=2)
+    return mean_image_f1(predictions, targets, iou_threshold)

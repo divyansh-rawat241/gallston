@@ -1,5 +1,49 @@
 # Benchmarks
 
+## 0. Current results (2026-10-05) - the only numbers to quote
+
+Leak-free, video/patient-grouped split; COCO mAP via `src/evaluation/coco_map.py`;
+95% CIs from a video-grouped bootstrap. Protocol pre-registered in
+[FINAL_EVAL_PROTOCOL.md](FINAL_EVAL_PROTOCOL.md); experiment history in
+[EXPERIMENTS.md](EXPERIMENTS.md). Data: `dataset_grouped_neg4` (convention A,
+web images and bad boxes removed, burned-in text inpainted).
+
+### 0.1 Grouped 5-fold cross-validation (train+valid, out-of-fold)
+
+RF-DETR-L 704, 1,978 images / 184 groups (`runs/cv4/rf704/oof_eval.json`).
+
+| mAP50:95 | mAP50 | Stone recall @0.25 | Stone images hit | FP / image | Polyp images with FP | AUROC vs polyp | Normal GB with FP |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0.454 [0.390, 0.512] | 0.658 [0.575, 0.729] | 0.73 | 87% | 0.53 | 28% | 0.87 | 0% |
+
+### 0.2 Held-out test, evaluated once
+
+287 images (116 with stones from **only 6 videos**, 171 stone-free: 150 polyp,
+21 normal gallbladder); video `a6` excluded pending relabelling.
+
+| Model | mAP50:95 | mAP50 | mAP75 | AP small / large | Stone recall @0.25 | Stone images hit | FP / image | Polyp images with FP | AUROC stone vs stone-free (vs polyp) |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| **Primary**: RF-DETR-L 704, train+valid, 20 epochs (`runs/final/test_primary.json`) | **0.369 [0.230, 0.563]** | **0.583 [0.321, 0.721]** | 0.397 | 0.336 / 0.672 | 0.65 | 96% | 0.71 | 40% | 0.90 (0.88) |
+| Secondary: 5 CV-fold models, WBF avg (`runs/final/test_ensemble.json`) | 0.400 [0.228, 0.577] | 0.665 [0.351, 0.784] | 0.413 | 0.337 / 0.713 | n/a* | n/a* | n/a* | n/a* | 0.95 (0.94) |
+
+\* WBF with `conf_type="avg"` averages each model's many low-score duplicate
+boxes into the fused score, so fused scores rarely reach the pre-registered
+0.25 threshold (recall 0.00 and FP 0.00 at 0.25 are artefacts of the score
+scale). Rank-based metrics (mAP, AUROC) are unaffected. Not re-tuned on test.
+
+Normal-gallbladder negatives: 0% FP / AUROC 1.00 for both models, but they come
+from a different scanner, so treat that as optimistic.
+
+**Reading the test numbers**: the CI is wide because test holds only 6 stone
+videos. The primary model's 0.369 is below the CV mean (0.454) and just below
+the CV interval, but the test interval [0.230, 0.563] contains the CV mean, so
+the two are consistent; the gap reflects the small test set and its video mix. The CV estimate (184 groups) is the more precise number;
+test is the untouched confirmation.
+
+---
+
+## Superseded numbers (kept for the record, do not quote)
+
 Regenerated 2026-08-09 by `python scripts/regenerate_all_numbers.py`.
 Do not hand-edit numbers here — rerun the script.
 

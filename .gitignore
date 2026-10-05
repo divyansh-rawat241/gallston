@@ -4,6 +4,11 @@ dataset_final/
 dataset_final_resplit/
 dataset_final_resplit_backup_*/
 dataset_new/
+dataset_grouped/
+dataset_grouped_*/
+dataset_cv*/
+dataset_joint/
+dataset_final_*/
 *.dcm
 hard_negatives.txt
 
@@ -39,3 +44,5 @@ __pycache__/
 *.whl
 ood_test.jpg
 sample_gb_*.jpg
+external/
+share/

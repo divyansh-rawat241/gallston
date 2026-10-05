@@ -57,13 +57,20 @@ number we claim.
 | Polygon labels | 2074 / 774 / 405 rows | `mlruns/phase1_validation.json` |
 | Unit tests | 16 / 16 green | `pytest tests/` |
 
-> **Split leakage warning (audited 2026-09-27).** 1,520 of 1,593 images are
-> `pseudo_<video>__<frame>` frames. All 49 video groups in the test split also
-> have frames in train (188/188 pseudo test images), and 52/52 val groups
-> overlap train. Every val/test number in this repo (HPO mAP, ablation ladder,
-> calibration, conformal coverage) is therefore measured on near-duplicates of
-> training frames and is optimistic. Re-split by video group before quoting
-> any of them externally.
+> **Every number above was measured on a leaked split** — see
+> [docs/LEAKAGE_AUDIT.md](docs/LEAKAGE_AUDIT.md). In `dataset_final_resplit/`,
+> 62% of test images are byte-identical copies of training images and every
+> test video also appears in training; the evaluation scripts also reported
+> per-image F1 under the name "mAP".
+>
+> **Use the grouped workflow instead:**
+>
+> ```bash
+> python scripts/build_grouped_split.py --overwrite   # whole videos per split, deduplicated
+> python scripts/check_leakage.py --data dataset_grouped   # must print RESULT: clean
+> python scripts/train_grouped.py --model both              # COCO-pretrained start, leakage-gated
+> python scripts/eval_grouped.py --yolo <best.pt> --rfdetr <best.pth>   # COCO mAP + grouped bootstrap CI
+> ```
 
 ---
 

@@ -1,4 +1,13 @@
 """
+DO NOT USE - superseded by scripts/build_grouped_split.py (2026-10-01).
+
+This script splits image-by-image (frames of one video land in different
+splits) and copies into a target folder it never empties, so re-running it
+duplicated 407 files across train/val/test. See docs/LEAKAGE_AUDIT.md.
+"""
+import sys
+sys.exit("resplit_dataset_corrected.py is unsafe; use scripts/build_grouped_split.py")
+"""
 Corrected Dataset Resplitting Script
 Uses ALL images from train/val/test directories and creates proper splits
 """

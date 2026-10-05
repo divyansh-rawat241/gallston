@@ -9,8 +9,8 @@ FIXED (2026-08-09):
     rows correctly. The old parser assumed `cls cx cy w h` and read the first
     four polygon vertices as a bbox, producing garbage boxes and zero mAP.
   - Loads weights from `production_models/` by default; overridable via CLI.
-  - `calculate_map` actually returns image-averaged F1; that name is kept for
-    now (patched separately). See `src/evaluation/map_calculator.py`.
+  - Reports COCO mAP50 (src/evaluation/coco_map.py). Before 2026-10-01 it
+    reported per-image mean F1 under the name mAP (docs/LEAKAGE_AUDIT.md).
 """
 import argparse
 import json
@@ -27,7 +27,7 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
 from src.evaluation.label_io import iter_split
-from src.evaluation.map_calculator import calculate_map
+from src.evaluation.coco_map import coco_map50
 from src.evaluation.shadow_analyzer import ShadowAnalyzer
 from src.models.ensemble import GallstoneEnsemble
 
@@ -144,7 +144,7 @@ def evaluate_configuration(ensemble, val_images, val_labels, config_name, use_sh
 
     # Calculate mAP
     try:
-        current_map = calculate_map(all_predictions, all_targets, iou_threshold=0.5)
+        current_map = coco_map50(all_predictions, all_targets)
         print(f"  mAP50: {current_map:.4f}")
         return current_map
     except Exception as e:
@@ -303,7 +303,7 @@ def main():
                 "data_dir": args.data_dir,
                 "yolo_weights": args.yolo_weights,
                 "rfdetr_weights": args.rfdetr_weights,
-                "metric": "per_image_mean_f1_at_iou_0.5",
+                "metric": "coco_map50",
                 "baseline": baseline_map,
                 "results": results,
                 "final": full_map,

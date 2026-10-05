@@ -8,7 +8,7 @@ from pathlib import Path
 import json
 from tqdm import tqdm
 from src.models.ensemble import GallstoneEnsemble
-from src.evaluation.map_calculator import calculate_map
+from src.evaluation.coco_map import coco_map50
 import torch
 
 def load_models():
@@ -146,7 +146,7 @@ def optimize_weights(models, val_images, val_labels, n_steps=20):
 
         # Calculate mAP
         try:
-            current_map = calculate_map(all_predictions, all_targets, iou_threshold=0.5)
+            current_map = coco_map50(all_predictions, all_targets)
             if current_map > best_map:
                 best_map = current_map
                 best_weights = weights

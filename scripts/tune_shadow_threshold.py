@@ -1,9 +1,9 @@
 """
 Shadow Analyzer Threshold Tuning Script.
 
-Sweeps `ShadowAnalyzer.threshold` in [lo, hi] and records the per-image mean-F1
-(what `calculate_map` currently returns; see src/evaluation/map_calculator.py)
-on the chosen split.
+Sweeps `ShadowAnalyzer.threshold` in [lo, hi] and records COCO mAP50 on the
+chosen split (per-image F1 was reported before 2026-10-01; see
+docs/LEAKAGE_AUDIT.md).
 
 FIXED (2026-08-09):
   - Reads real 368/201-image split from `dataset_final_resplit/{val,test}`
@@ -29,7 +29,7 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
 from scripts.comprehensive_evaluation import load_ensemble, load_validation_data
-from src.evaluation.map_calculator import calculate_map
+from src.evaluation.coco_map import coco_map50
 from src.evaluation.shadow_analyzer import ShadowAnalyzer
 
 
@@ -88,7 +88,7 @@ def tune_shadow_threshold(
             )
 
         try:
-            metric = calculate_map(all_predictions, all_targets, iou_threshold=0.5)
+            metric = coco_map50(all_predictions, all_targets)
         except Exception as exc:
             print(f"  metric calc failed at threshold={threshold:.3f}: {exc}")
             continue
@@ -140,7 +140,7 @@ def main():
             {
                 "split": args.split,
                 "data_dir": args.data_dir,
-                "metric": "per_image_mean_f1_at_iou_0.5",
+                "metric": "coco_map50",
                 "best_threshold": best_threshold,
                 "best_metric": best_metric,
                 "all_results": results,
